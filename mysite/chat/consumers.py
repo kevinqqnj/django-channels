@@ -1,4 +1,4 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer, SyncConsumer
 import json
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -26,6 +26,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
 
+        await self.channel_layer.send(
+        "thumbnails-generate",
+            {
+                "type": "generate",
+                "id": 123456789,
+            },
+        )
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -43,3 +50,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message
         }))
+
+
+class GenerateConsumer(SyncConsumer):
+    def generate(self, message):
+        print(f'worker is handling task: type=generate, id={message["id"]}')

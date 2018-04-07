@@ -22,6 +22,19 @@ services:
       # - db
       - redis
 
+  worker:
+    build: .
+    command: python manage.py runworker thumbnails-generate
+    env_file: .env
+    volumes:
+      - ./mysite:/code
+    # ports:
+    #   - "5000:5000"
+    depends_on:
+      # - db
+      - web
+      - redis
+
   redis:
     image: redis
     # volumes:
